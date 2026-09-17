@@ -1,0 +1,104 @@
+<%- include('../partials/agentNav', { pageTitle: 'Field Agent Dashboard', activeNav: 'dashboard' }) %>
+
+<main class="main-content">
+  <div class="dashboard-header">
+    <div>
+      <h1>Field Agent Dashboard</h1>
+      <p>Welcome back, <strong><%= (typeof user !== 'undefined' && user && user.name) ? user.name : 'Field Agent' %></strong>! Route dispatch, field weigh-in, and recycling operations.</p>
+    </div>
+    <div>
+      <a href="/agent/pickups" class="btn-primary" style="text-decoration: none; width: auto; display: inline-block;">
+        🚚 Assigned Pickups Queue
+      </a>
+    </div>
+  </div>
+
+  <!-- Agent Metrics Cards -->
+  <div class="card-grid">
+    <div class="stat-card">
+      <div class="stat-title">Currently Scheduled</div>
+      <div class="stat-value" style="color: var(--status-scheduled);">
+        <%= (typeof stats !== 'undefined' && typeof stats.currentlyAssigned !== 'undefined') ? stats.currentlyAssigned : 0 %>
+      </div>
+      <div class="stat-desc">Pickups awaiting field collection</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">Collected & In Transit</div>
+      <div class="stat-value" style="color: var(--status-collected);">
+        <%= (typeof stats !== 'undefined' && typeof stats.collectedPendingRecycling !== 'undefined') ? stats.collectedPendingRecycling : 0 %>
+      </div>
+      <div class="stat-desc">Weighed, awaiting drop-off</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">Recycled This Month</div>
+      <div class="stat-value" style="color: var(--status-recycled);">
+        <%= (typeof stats !== 'undefined' && typeof stats.recycledThisMonth !== 'undefined') ? stats.recycledThisMonth : 0 %>
+      </div>
+      <div class="stat-desc">Completed during current month</div>
+    </div>
+  </div>
+
+  <!-- Pending Field Queue -->
+  <div class="feature-card" style="padding: 1.5rem; overflow-x: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h2>Active Field Assignments</h2>
+      <a href="/agent/pickups" style="color: var(--accent-dark); font-weight: 600; text-decoration: none; font-size: 0.875rem;">
+        Open Full Queue &rarr;
+      </a>
+    </div>
+
+    <% if (typeof pendingPickups !== 'undefined' && pendingPickups.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Citizen / Contact</th>
+            <th>Category / Qty</th>
+            <th>Pickup Address</th>
+            <th>Target Centre</th>
+            <th>Status</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% pendingPickups.forEach(p => { %>
+            <tr>
+              <td>
+                <strong><%= p.citizen ? p.citizen.name : 'Citizen' %></strong>
+                <div class="num" style="font-size: 0.8rem; color: var(--ink-muted);"><%= (p.citizen && p.citizen.phone) ? p.citizen.phone : '' %></div>
+              </td>
+              <td>
+                <strong><%= p.itemCategory ? p.itemCategory.name : 'E-Waste' %></strong>
+                <div class="num" style="font-size: 0.8rem; color: var(--ink-muted);"><%= p.quantity %> item(s) &bull; <%= p.approxWeightKg %> kg</div>
+              </td>
+              <td>
+                <div><%= p.address %></div>
+                <div style="font-size: 0.75rem; color: var(--ink-muted);">Zone: <strong><%= p.area %></strong></div>
+              </td>
+              <td>
+                <%= p.collectionCentre ? p.collectionCentre.name : 'Unassigned' %>
+              </td>
+              <td>
+                <span class="status-pill status-<%= p.status %>">
+                  <%= p.status %>
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <a href="/agent/pickups" class="btn-primary" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; width: auto; text-decoration: none; display: inline-block;">
+                  Process
+                </a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <div style="text-align: center; padding: 2rem 1rem;">
+        <p style="color: var(--ink-muted);">No active field assignments pending in your queue.</p>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle : (typeof title !== 'undefined' ? title : 'Citizen Portal') %> - E-Waste Pickup System</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="role-citizen">
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/citizen" class="brand-link">
+        <span style="font-size: 1.4rem;">♻️</span>
+        <span class="brand-title">EcoPickup</span>
+        <span class="portal-tag">CITIZEN PORTAL</span>
+      </a>
+      <ul class="nav-menu">
+        <li>
+          <a href="/citizen" class="nav-link <%= (typeof activeNav !== 'undefined' && activeNav === 'dashboard') ? 'active' : '' %>">
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="/citizen/book" class="nav-link <%= (typeof activeNav !== 'undefined' && activeNav === 'book') ? 'active' : '' %>">
+            Book a Pickup
+          </a>
+        </li>
+        <li>
+          <a href="/citizen/requests" class="nav-link <%= (typeof activeNav !== 'undefined' && activeNav === 'requests') ? 'active' : '' %>">
+            My Requests
+          </a>
+        </li>
+        <li>
+          <a href="/citizen/wallet" class="nav-link <%= (typeof activeNav !== 'undefined' && activeNav === 'wallet') ? 'active' : '' %>">
+            Wallet
+          </a>
+        </li>
+        <li>
+          <span class="user-profile-badge">
+            👤 <%= (typeof user !== 'undefined' && user && user.name) ? user.name : 'Citizen' %>
+            <% if (typeof user !== 'undefined' && user && typeof user.rewardPoints !== 'undefined') { %>
+              <span class="badge-num" style="color: var(--accent-dark); font-weight: 700; margin-left: 0.25rem;">
+                [<%= user.rewardPoints %> pts]
+              </span>
+            <% } %>
+          </span>
+        </li>
+        <li><a href="/logout" class="btn-logout">Logout</a></li>
+      </ul>
+    </div>
+  </nav>

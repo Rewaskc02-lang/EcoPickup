@@ -1,0 +1,133 @@
+<%- include('../partials/agentNav', { pageTitle: 'Assigned Pickups', activeNav: 'pickups' }) %>
+
+<main class="main-content">
+  <div class="dashboard-header">
+    <div>
+      <h1>Field Pickup Queue</h1>
+      <p>Manage your assigned e-waste collection orders, perform weigh-ins, and update recycling statuses.</p>
+    </div>
+    <div>
+      <span class="role-tag agent" style="font-size: 0.9rem; padding: 0.35rem 0.8rem;">
+        Active Assignments: <%= typeof pickups !== 'undefined' ? pickups.length : 0 %>
+      </span>
+    </div>
+  </div>
+
+  <div class="feature-card" style="padding: 1.5rem; overflow-x: auto;">
+    <% if (typeof pickups !== 'undefined' && pickups.length > 0) { %>
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--slate-200); color: var(--slate-600); font-size: 0.85rem; text-transform: uppercase;">
+            <th style="padding: 0.75rem 1rem;">Citizen / Pickup Location</th>
+            <th style="padding: 0.75rem 1rem;">E-Waste Details</th>
+            <th style="padding: 0.75rem 1rem;">Preferred Date</th>
+            <th style="padding: 0.75rem 1rem;">Status</th>
+            <th style="padding: 0.75rem 1rem;">Destination Centre</th>
+            <th style="padding: 0.75rem 1rem; text-align: right;">Field Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% pickups.forEach(pickup => { %>
+            <tr style="border-bottom: 1px solid var(--slate-200); font-size: 0.925rem;">
+              <td style="padding: 1rem; vertical-align: top;">
+                <strong><%= pickup.citizen ? pickup.citizen.name : 'Citizen' %></strong>
+                <div style="font-size: 0.8rem; color: var(--slate-600); margin-top: 0.25rem;">
+                  📞 <%= (pickup.citizen && pickup.citizen.phone) ? pickup.citizen.phone : 'No phone listed' %>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--slate-700); margin-top: 0.25rem;">
+                  📍 <%= pickup.address %>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--slate-400);">
+                  Zone: <strong><%= pickup.area %></strong>
+                </div>
+              </td>
+
+              <td style="padding: 1rem; vertical-align: top;">
+                <strong><%= pickup.itemCategory ? pickup.itemCategory.name : 'E-Waste' %></strong>
+                <div style="font-size: 0.8rem; color: var(--slate-600);">
+                  Qty: <%= pickup.quantity %> item(s)
+                </div>
+                <div style="font-size: 0.8rem; color: var(--slate-500);">
+                  Est. Wt: <%= pickup.approxWeightKg %> kg
+                </div>
+                <% if (pickup.actualWeightKg !== null) { %>
+                  <div style="font-size: 0.85rem; color: var(--primary-dark); font-weight: 700; margin-top: 0.25rem;">
+                    ⚖️ Weighed: <%= pickup.actualWeightKg %> kg
+                  </div>
+                <% } %>
+              </td>
+
+              <td style="padding: 1rem; vertical-align: top;">
+                <strong><%= new Date(pickup.preferredDate).toLocaleDateString() %></strong>
+              </td>
+
+              <td style="padding: 1rem; vertical-align: top;">
+                <% if (pickup.status === 'Scheduled') { %>
+                  <span class="role-tag agent" style="font-size: 0.8rem;">Scheduled</span>
+                <% } else if (pickup.status === 'Collected') { %>
+                  <span class="role-tag citizen" style="font-size: 0.8rem; background: #e0e7ff; color: #3730a3; border-color: #c7d2fe;">Collected</span>
+                <% } else { %>
+                  <span class="role-tag citizen" style="font-size: 0.8rem;"><%= pickup.status %></span>
+                <% } %>
+              </td>
+
+              <td style="padding: 1rem; vertical-align: top;">
+                <% if (pickup.collectionCentre) { %>
+                  <strong><%= pickup.collectionCentre.name %></strong>
+                  <div style="font-size: 0.75rem; color: var(--slate-500);"><%= pickup.collectionCentre.area %></div>
+                <% } else { %>
+                  <span style="color: var(--slate-400); font-style: italic;">Unspecified</span>
+                <% } %>
+              </td>
+
+              <td style="padding: 1rem; vertical-align: top; text-align: right; min-width: 200px;">
+                <% if (pickup.status === 'Scheduled') { %>
+                  <!-- Field Weigh-in Form to mark Collected -->
+                  <form action="/agent/pickups/collect/<%= pickup._id %>" method="POST" style="display: flex; flex-direction: column; gap: 0.4rem; align-items: flex-end;">
+                    <div style="display: flex; align-items: center; gap: 0.35rem;">
+                      <input 
+                        type="number" 
+                        step="0.1" 
+                        name="actualWeightKg" 
+                        class="form-control" 
+                        style="width: 100px; padding: 0.35rem 0.5rem; font-size: 0.85rem;" 
+                        placeholder="Actual kg" 
+                        value="<%= pickup.approxWeightKg %>"
+                        min="0.1" 
+                        required
+                      >
+                      <span style="font-size: 0.8rem; color: var(--slate-500);">kg</span>
+                    </div>
+                    <button type="submit" class="btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; width: auto; background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                      Mark Collected
+                    </button>
+                  </form>
+                <% } else if (pickup.status === 'Collected') { %>
+                  <!-- Mark Recycled trigger -->
+                  <div style="display: flex; flex-direction: column; gap: 0.4rem; align-items: flex-end;">
+                    <div style="font-size: 0.8rem; color: var(--slate-600);">
+                      Ready for drop-off: <strong><%= pickup.actualWeightKg %> kg</strong>
+                    </div>
+                    <form action="/agent/pickups/recycle/<%= pickup._id %>" method="POST" onsubmit="return confirm('Confirm recycling and reward points disbursement for this pickup?');">
+                      <button type="submit" class="btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; width: auto; background: linear-gradient(135deg, #10b981, #059669);">
+                        ♻️ Mark Recycled
+                      </button>
+                    </form>
+                  </div>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <div style="text-align: center; padding: 3rem 1rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🛵</div>
+        <h3 style="margin-bottom: 0.5rem; color: var(--slate-800);">No Assigned Pickups</h3>
+        <p style="color: var(--slate-500);">You have no active collection requests assigned to you at the moment.</p>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,169 @@
+<%- include('../partials/citizenNav', { pageTitle: 'Request Details' , activeNav: 'requests' }) %>
+
+  <main class="main-content">
+    <div class="dashboard-header">
+      <div>
+        <a href="/citizen/requests"
+          style="color: var(--ink-muted); text-decoration: none; font-size: 0.875rem; font-weight: 600;">
+          &larr; Back to My Requests
+        </a>
+        <h1 style="margin-top: 0.5rem;">Request #<span class="num">
+            <%= request._id.toString().slice(-6).toUpperCase() %>
+          </span></h1>
+        <p>Created on <span class="num">
+            <%= new Date(request.createdAt).toLocaleString() %>
+          </span></p>
+      </div>
+      <div>
+        <span class="status-pill status-<%= request.status %>" style="font-size: 0.85rem; padding: 0.35rem 0.75rem;">
+          <%= request.status %>
+        </span>
+      </div>
+    </div>
+
+    <!-- Status Progress Bar / History Tra
+   cker -->
+    <div class="feature-card" style="margin-bottom: 2rem;">
+      <h2 style="margin-bottom: 1.25rem;">Collection Progress</h2>
+
+      <% const states=['Requested', 'Scheduled' , 'Collected' , 'Recycled' ]; const
+        currentIndex=states.indexOf(request.status); const isRejected=request.status==='Rejected' ; %>
+
+        <% if (isRejected) { %>
+          <div class="alert alert-danger" style="margin-bottom: 0;">
+            ❌ This request has been rejected. Please review your item details or submit a new request.
+          </div>
+          <% } else { %>
+            <div style="display: flex; justify-content: space-between; position: relative; gap: 1rem; flex-wrap: wrap;">
+              <% states.forEach((st, idx)=> {
+                const isDone = idx <= currentIndex; const isCurrent=idx===currentIndex; %>
+                  <div
+                    style="flex: 1; min-width: 130px; text-align: center; padding: 1rem; border-radius: var(--radius-sm); background: <%= isCurrent ? 'var(--accent-light)' : (isDone ? 'var(--cream-border-subtle)' : 'transparent') %>; border: 1px solid <%= isCurrent ? 'var(--accent)' : 'var(--cream-border)' %>;">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.35rem;">
+                      <%= idx===0 ? '📝' : (idx===1 ? '📅' : (idx===2 ? '🚚' : '♻️' )) %>
+                    </div>
+                    <div
+                      style="font-weight: 700; font-size: 0.95rem; color: <%= isCurrent ? 'var(--accent-dark)' : (isDone ? 'var(--ink)' : 'var(--ink-muted)') %>;">
+                      <%= st %>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--ink-muted); margin-top: 0.25rem;">
+                      <%= idx===0 ? 'Request logged' : (idx===1 ? 'Agent assigned' : (idx===2 ? 'Picked up'
+                        : 'Rewards credited' )) %>
+                    </div>
+                  </div>
+                  <% }); %>
+            </div>
+            <% } %>
+    </div>
+
+    <div class="card-grid" style="grid-template-columns: 1fr 1fr;">
+      <!-- Request Details -->
+      <div class="feature-card">
+        <h2>Item & Location Details</h2>
+        <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-top: 1rem;">
+          <div>
+            <span style="font-size: 0.8rem; color: var(--ink-muted); display: block; text-transform: uppercase;">E-Waste
+              Category</span>
+            <strong>
+              <%= request.itemCategory ? request.itemCategory.name : 'N/A' %>
+            </strong>
+            <span class="num" style="font-size: 0.85rem; color: var(--ink-muted);"> (<%= request.itemCategory ?
+                request.itemCategory.rewardPointsPerKg : 0 %> pts/kg rate)</span>
+          </div>
+          <div>
+            <span style="font-size: 0.8rem; color: var(--ink-muted); display: block; text-transform: uppercase;">Item
+              Quantity</span>
+            <strong class="num">
+              <%= request.quantity %> item(s)
+            </strong>
+          </div>
+          <div>
+            <span
+              style="font-size: 0.8rem; color: var(--ink-muted); display: block; text-transform: uppercase;">Estimated
+              Approx Weight</span>
+            <strong class="num">
+              <%= request.approxWeightKg %> kg
+            </strong>
+          </div>
+          <div>
+            <span style="font-size: 0.8rem; color: var(--ink-muted); display: block; text-transform: uppercase;">Pickup
+              Street Address</span>
+            <strong>
+              <%= request.address %>
+            </strong>
+          </div>
+          <div>
+            <span style="font-size: 0.8rem; color: var(--ink-muted); display: block; text-transform: uppercase;">Area /
+              Operational Zone</span>
+            <strong>
+              <%= request.area %>
+            </strong>
+          </div>
+          <div>
+            <span
+              style="font-size: 0.8rem; color: var(--ink-muted); display: block; text-transform: uppercase;">Preferred
+              Pickup Date</span>
+            <strong class="num">
+              <%= new Date(request.preferredDate).toLocaleDateString() %>
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fulfillment & Agent Details -->
+      <div class="feature-card">
+        <h2>Collection & Processing</h2>
+        <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-top: 1rem;">
+          <div>
+            <span
+              style="font-size: 0.8rem; color: var(--ink-muted); display: block; text-transform: uppercase;">Assigned
+              Field Agent</span>
+            <% if (request.assignedAgent) { %>
+              <strong>
+                <%= request.assignedAgent.name %>
+              </strong>
+              <div class="num" style="font-size: 0.85rem; color: var(--ink-muted);">📞 <%= request.assignedAgent.phone
+                  || 'Contact via dispatcher' %>
+              </div>
+              <% } else { %>
+                <span style="color: var(--ink-muted); font-style: italic;">Awaiting dispatch assignment by admin</span>
+                <% } %>
+          </div>
+
+          <div>
+            <span
+              style="font-size: 0.8rem; color: var(--ink-muted); display: block; text-transform: uppercase;">Destination
+              Collection Centre</span>
+            <% if (request.collectionCentre) { %>
+              <strong>
+                <%= request.collectionCentre.name %>
+              </strong>
+              <div style="font-size: 0.85rem; color: var(--ink-muted);">
+                <%= request.collectionCentre.address %>, <%= request.collectionCentre.area %>
+              </div>
+              <% } else { %>
+                <span style="color: var(--ink-muted); font-style: italic;">Assigned at dispatch</span>
+                <% } %>
+          </div>
+
+          <div>
+            <span style="font-size: 0.8rem; color: var(--ink-muted); display: block; text-transform: uppercase;">Actual
+              Measured Weight</span>
+            <strong class="num">
+              <%= request.actualWeightKg !==null ? (request.actualWeightKg + ' kg' ) : 'Pending physical weigh-in' %>
+            </strong>
+          </div>
+
+          <div>
+            <span style="font-size: 0.8rem; color: var(--ink-muted); display: block; text-transform: uppercase;">Reward
+              Points Earned</span>
+            <strong class="num" style="color: var(--status-recycled); font-size: 1.25rem;">
+              <%= request.rewardPointsEarned %> PTS
+            </strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>

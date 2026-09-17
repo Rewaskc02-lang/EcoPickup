@@ -1,0 +1,73 @@
+<%- include('../partials/adminNav', { pageTitle: isEdit ? 'Edit Category' : 'Add Category', activeNav: 'categories' }) %>
+
+<main class="main-content">
+  <div class="dashboard-header">
+    <div>
+      <a href="/admin/categories" style="color: var(--slate-600); text-decoration: none; font-size: 0.9rem; font-weight: 600;">
+        &larr; Back to Categories
+      </a>
+      <h1 style="margin-top: 0.5rem;"><%= isEdit ? 'Edit Item Category' : 'Create New Category' %></h1>
+      <p><%= isEdit ? 'Update e-waste classification and reward points per kg.' : 'Define a new recyclable item type and its reward exchange rate.' %></p>
+    </div>
+  </div>
+
+  <div style="max-width: 580px; margin: 0 auto;">
+    <div class="feature-card" style="padding: 2.25rem;">
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+
+      <form action="<%= isEdit ? ('/admin/categories/edit/' + category._id) : '/admin/categories' %>" method="POST">
+        <div class="form-group">
+          <label class="form-label" for="name">Category Name *</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            class="form-control" 
+            placeholder="e.g. Lithium Batteries" 
+            value="<%= (category && category.name) ? category.name : '' %>"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="rewardPointsPerKg">Reward Points Per Kilogram *</label>
+          <input 
+            type="number" 
+            id="rewardPointsPerKg" 
+            name="rewardPointsPerKg" 
+            class="form-control" 
+            placeholder="e.g. 150" 
+            value="<%= (category && category.rewardPointsPerKg) ? category.rewardPointsPerKg : '' %>"
+            min="0"
+            required
+          >
+          <p class="form-help">Points credited to the citizen per kg when recycled.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">Description (Optional)</label>
+          <textarea 
+            id="description" 
+            name="description" 
+            class="form-control" 
+            rows="3" 
+            placeholder="Details about accepted items and safety requirements..."
+          ><%= (category && category.description) ? category.description : '' %></textarea>
+        </div>
+
+        <div style="margin-top: 1.75rem; display: flex; gap: 1rem;">
+          <button type="submit" class="btn-primary">
+            <%= isEdit ? 'Save Changes' : 'Create Category' %>
+          </button>
+          <a href="/admin/categories" class="btn-logout" style="background: var(--slate-100); color: var(--slate-700); text-decoration: none; text-align: center; padding: 0.85rem 1.25rem; font-weight: 600;">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,108 @@
+<%- include('../partials/citizenNav', { pageTitle: 'Book a Pickup', activeNav: 'book' }) %>
+
+<main class="main-content">
+  <div class="dashboard-header">
+    <div>
+      <h1>Book an E-Waste Pickup</h1>
+      <p>Schedule a doorstep pickup for your discarded electronic items.</p>
+    </div>
+  </div>
+
+  <div style="max-width: 680px; margin: 0 auto;">
+    <div class="feature-card" style="padding: 2.25rem;">
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+
+      <form action="/citizen/book" method="POST">
+        <div class="form-group">
+          <label class="form-label" for="itemCategory">E-Waste Category *</label>
+          <select id="itemCategory" name="itemCategory" class="form-select" required>
+            <option value="" disabled selected>-- Select an Item Category --</option>
+            <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+              <% categories.forEach(cat => { %>
+                <option value="<%= cat._id %>">
+                  <%= cat.name %> (<%= cat.rewardPointsPerKg %> pts/kg) &mdash; <%= cat.description %>
+                </option>
+              <% }); %>
+            <% } %>
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="quantity">Quantity (Number of Items) *</label>
+            <input 
+              type="number" 
+              id="quantity" 
+              name="quantity" 
+              class="form-control" 
+              min="1" 
+              value="1" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="approxWeightKg">Approx Weight (Kg) *</label>
+            <input 
+              type="number" 
+              step="0.1" 
+              id="approxWeightKg" 
+              name="approxWeightKg" 
+              class="form-control" 
+              placeholder="e.g. 2.5" 
+              min="0.1" 
+              required
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="address">Pickup Street Address *</label>
+          <input 
+            type="text" 
+            id="address" 
+            name="address" 
+            class="form-control" 
+            placeholder="e.g. Flat 302, Green Valley Apts, Main Road" 
+            value="<%= (typeof user !== 'undefined' && user && user.address) ? user.address : '' %>"
+            required
+          >
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="area">Locality / Area Zone *</label>
+            <input 
+              type="text" 
+              id="area" 
+              name="area" 
+              class="form-control" 
+              placeholder="e.g. North Zone / Downtown" 
+              required
+            >
+            <p class="form-help">Used for area-wise route planning</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="preferredDate">Preferred Pickup Date *</label>
+            <input 
+              type="date" 
+              id="preferredDate" 
+              name="preferredDate" 
+              class="form-control" 
+              required
+            >
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+          <button type="submit" class="btn-primary">Submit Pickup Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

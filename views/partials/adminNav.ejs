@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle : (typeof title !== 'undefined' ? title : 'Admin Portal') %> - E-Waste Pickup System</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="role-admin">
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/admin" class="brand-link">
+        <span style="font-size: 1.4rem;">⚙️</span>
+        <span class="brand-title">EcoPickup</span>
+        <span class="portal-tag">RECYCLER ADMIN</span>
+      </a>
+      <ul class="nav-menu">
+        <li>
+          <a href="/admin" class="nav-link <%= (typeof activeNav !== 'undefined' && activeNav === 'dashboard') ? 'active' : '' %>">
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="/admin/requests" class="nav-link <%= (typeof activeNav !== 'undefined' && activeNav === 'requests') ? 'active' : '' %>">
+            Request Queue
+          </a>
+        </li>
+        <li>
+          <a href="/admin/categories" class="nav-link <%= (typeof activeNav !== 'undefined' && activeNav === 'categories') ? 'active' : '' %>">
+            Categories
+          </a>
+        </li>
+        <li>
+          <a href="/admin/centres" class="nav-link <%= (typeof activeNav !== 'undefined' && activeNav === 'centres') ? 'active' : '' %>">
+            Collection Centres
+          </a>
+        </li>
+        <li>
+          <span class="user-profile-badge">
+            🛡️ <%= (typeof user !== 'undefined' && user && user.name) ? user.name : 'Administrator' %>
+          </span>
+        </li>
+        <li><a href="/logout" class="btn-logout">Logout</a></li>
+      </ul>
+    </div>
+  </nav>

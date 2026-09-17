@@ -1,0 +1,71 @@
+<%- include('../partials/adminNav', { pageTitle: 'Collection Centres', activeNav: 'centres' }) %>
+
+<main class="main-content">
+  <div class="dashboard-header">
+    <div>
+      <h1>Collection Centres Catalogue</h1>
+      <p>Maintain the operational recycling centres and regional intake hubs.</p>
+    </div>
+    <div>
+      <a href="/admin/centres/add" class="btn-primary" style="text-decoration: none; padding: 0.65rem 1.25rem; width: auto;">
+        + Add New Centre
+      </a>
+    </div>
+  </div>
+
+  <div class="feature-card" style="padding: 1.5rem; overflow-x: auto;">
+    <% if (typeof centres !== 'undefined' && centres.length > 0) { %>
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--slate-200); color: var(--slate-600); font-size: 0.85rem; text-transform: uppercase;">
+            <th style="padding: 0.75rem 1rem;">Centre Name</th>
+            <th style="padding: 0.75rem 1rem;">Location & Area</th>
+            <th style="padding: 0.75rem 1rem;">Contact Phone</th>
+            <th style="padding: 0.75rem 1rem;">Capacity</th>
+            <th style="padding: 0.75rem 1rem; text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% centres.forEach(centre => { %>
+            <tr style="border-bottom: 1px solid var(--slate-200); font-size: 0.95rem;">
+              <td style="padding: 1rem;">
+                <strong>🏬 <%= centre.name %></strong>
+              </td>
+              <td style="padding: 1rem;">
+                <div>📍 <%= centre.address %></div>
+                <div style="font-size: 0.8rem; color: var(--slate-500);">Zone: <strong><%= centre.area %></strong></div>
+              </td>
+              <td style="padding: 1rem; color: var(--slate-700);">
+                <%= centre.contactNumber || 'N/A' %>
+              </td>
+              <td style="padding: 1rem;">
+                <%= centre.capacityKg ? (centre.capacityKg.toLocaleString() + ' kg') : 'Unlimited' %>
+              </td>
+              <td style="padding: 1rem; text-align: right;">
+                <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                  <a href="/admin/centres/edit/<%= centre._id %>" class="btn-primary" style="text-decoration: none; padding: 0.4rem 0.8rem; font-size: 0.85rem; width: auto; display: inline-block;">
+                    Edit
+                  </a>
+                  <form action="/admin/centres/delete/<%= centre._id %>" method="POST" onsubmit="return confirm('Delete this collection centre?');" style="display: inline;">
+                    <button type="submit" class="btn-logout" style="border: none; cursor: pointer; padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                      Delete
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <div style="text-align: center; padding: 3rem 1rem;">
+        <p style="color: var(--slate-500); margin-bottom: 1rem;">No collection centres registered yet.</p>
+        <a href="/admin/centres/add" class="btn-primary" style="display: inline-block; width: auto; padding: 0.75rem 1.5rem; text-decoration: none;">
+          Register First Centre
+        </a>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

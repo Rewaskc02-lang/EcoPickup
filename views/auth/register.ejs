@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="role-citizen">
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div style="font-size: 2.25rem; margin-bottom: 0.35rem;">🌱</div>
+        <h1>Create Account</h1>
+        <p>Join the circular economy & dispose e-waste safely</p>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+
+      <form action="/register" method="POST">
+        <div class="form-group">
+          <label class="form-label" for="name">Full Name</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            class="form-control" 
+            placeholder="e.g. Alex Morgan" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            class="form-control" 
+            placeholder="e.g. alex@example.com" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            class="form-control" 
+            placeholder="At least 6 characters" 
+            minlength="6"
+            required
+          >
+        </div>
+
+        <!-- 
+          NOTE: In production, agent/admin accounts would typically be created 
+          by an existing administrator rather than self-registered. It is left 
+          open as a selectable option here for demonstration & evaluation purposes.
+        -->
+        <div class="form-group">
+          <label class="form-label" for="role">Select Portal Role</label>
+          <select id="role" name="role" class="form-select" required>
+            <option value="citizen" selected>Citizen (Book pickups & earn reward points)</option>
+            <option value="agent">Collection Agent (Field pickup & status updates)</option>
+            <option value="admin">Admin (Recycler operations, dispatch & catalogues)</option>
+          </select>
+          <p class="form-help">Choose the role corresponding to the portal you wish to test.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="phone">Phone Number (Optional)</label>
+          <input 
+            type="tel" 
+            id="phone" 
+            name="phone" 
+            class="form-control" 
+            placeholder="e.g. +1 555-0199"
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="address">Default Address (Optional for Citizen)</label>
+          <input 
+            type="text" 
+            id="address" 
+            name="address" 
+            class="form-control" 
+            placeholder="e.g. 123 Green Street, Sector 4"
+          >
+        </div>
+
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <button type="submit" class="btn-primary">Register Account</button>
+        </div>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--ink-muted);">
+        Already have an account? <a href="/login" style="color: var(--accent-dark); font-weight: 600; text-decoration: none;">Sign in here</a>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>

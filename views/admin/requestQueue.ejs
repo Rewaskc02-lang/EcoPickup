@@ -1,0 +1,108 @@
+<%- include('../partials/adminNav', { pageTitle: 'Pickup Request Queue', activeNav: 'requests' }) %>
+
+<main class="main-content">
+  <div class="dashboard-header">
+    <div>
+      <h1>Citizen Request Queue</h1>
+      <p>Review incoming e-waste pickup requests, dispatch field agents, and designate target recycling centres.</p>
+    </div>
+    <div>
+      <span class="role-tag citizen" style="font-size: 0.9rem; padding: 0.35rem 0.8rem;">
+        Pending Approvals: <%= typeof requests !== 'undefined' ? requests.length : 0 %>
+      </span>
+    </div>
+  </div>
+
+  <div class="feature-card" style="padding: 1.5rem; overflow-x: auto;">
+    <% if (typeof requests !== 'undefined' && requests.length > 0) { %>
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--slate-200); color: var(--slate-600); font-size: 0.85rem; text-transform: uppercase;">
+            <th style="padding: 0.75rem 1rem;">Citizen / Location</th>
+            <th style="padding: 0.75rem 1rem;">Category & Items</th>
+            <th style="padding: 0.75rem 1rem;">Preferred Date</th>
+            <th style="padding: 0.75rem 1rem;">Status</th>
+            <th style="padding: 0.75rem 1rem;">Assign Agent & Centre</th>
+            <th style="padding: 0.75rem 1rem; text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% requests.forEach(req => { %>
+            <tr style="border-bottom: 1px solid var(--slate-200); font-size: 0.925rem;">
+              <td style="padding: 1rem; vertical-align: top;">
+                <strong><%= req.citizen ? req.citizen.name : 'Citizen' %></strong>
+                <div style="font-size: 0.8rem; color: var(--slate-500);"><%= req.citizen ? req.citizen.email : '' %></div>
+                <div style="font-size: 0.8rem; color: var(--slate-600); margin-top: 0.25rem;">📍 <%= req.address %></div>
+                <div style="font-size: 0.75rem; color: var(--slate-400);">Area Zone: <strong><%= req.area %></strong></div>
+              </td>
+              <td style="padding: 1rem; vertical-align: top;">
+                <strong><%= req.itemCategory ? req.itemCategory.name : 'Unknown' %></strong>
+                <div style="font-size: 0.8rem; color: var(--slate-600);">
+                  Qty: <%= req.quantity %> &bull; Est. Wt: <%= req.approxWeightKg %> kg
+                </div>
+              </td>
+              <td style="padding: 1rem; vertical-align: top;">
+                <strong><%= new Date(req.preferredDate).toLocaleDateString() %></strong>
+              </td>
+              <td style="padding: 1rem; vertical-align: top;">
+                <span class="role-tag citizen">
+                  <%= req.status %>
+                </span>
+              </td>
+              <td style="padding: 1rem; vertical-align: top; min-width: 250px;">
+                <form id="assign-form-<%= req._id %>" action="/admin/requests/approve/<%= req._id %>" method="POST">
+                  <div style="margin-bottom: 0.5rem;">
+                    <select name="assignedAgent" class="form-select" style="padding: 0.45rem 0.65rem; font-size: 0.85rem;" required>
+                      <option value="" disabled selected>-- Select Field Agent --</option>
+                      <% if (typeof agents !== 'undefined' && agents.length > 0) { %>
+                        <% agents.forEach(agent => { %>
+                          <option value="<%= agent._id %>">
+                            🛵 <%= agent.name %> (<%= agent.email %>)
+                          </option>
+                        <% }); %>
+                      <% } else { %>
+                        <option value="" disabled>No registered agents available</option>
+                      <% } %>
+                    </select>
+                  </div>
+                  <div>
+                    <select name="collectionCentre" class="form-select" style="padding: 0.45rem 0.65rem; font-size: 0.85rem;">
+                      <option value="">-- Assign Collection Centre (Optional) --</option>
+                      <% if (typeof centres !== 'undefined' && centres.length > 0) { %>
+                        <% centres.forEach(centre => { %>
+                          <option value="<%= centre._id %>">
+                            🏬 <%= centre.name %> (<%= centre.area %>)
+                          </option>
+                        <% }); %>
+                      <% } %>
+                    </select>
+                  </div>
+                </form>
+              </td>
+              <td style="padding: 1rem; vertical-align: top; text-align: right; min-width: 140px;">
+                <div style="display: flex; flex-direction: column; gap: 0.4rem; align-items: flex-end;">
+                  <button type="submit" form="assign-form-<%= req._id %>" class="btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem; width: auto; background: linear-gradient(135deg, var(--primary), var(--primary-dark));">
+                    Approve & Assign
+                  </button>
+                  <form action="/admin/requests/reject/<%= req._id %>" method="POST" onsubmit="return confirm('Are you sure you want to reject this pickup request?');">
+                    <button type="submit" class="btn-logout" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border: none; cursor: pointer;">
+                      Reject
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <div style="text-align: center; padding: 3rem 1rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">✨</div>
+        <h3 style="margin-bottom: 0.5rem; color: var(--slate-800);">Queue is Clear!</h3>
+        <p style="color: var(--slate-500);">There are currently no unassigned citizen pickup requests requiring approval.</p>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

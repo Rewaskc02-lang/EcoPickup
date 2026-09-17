@@ -1,0 +1,196 @@
+<%- include('../partials/citizenNav', { pageTitle: 'My Reward Wallet', activeNav: 'wallet' }) %>
+
+<main class="main-content">
+  <div class="dashboard-header">
+    <div>
+      <h1>Reward Wallet & Redemption</h1>
+      <p>Redeem your e-waste recycling reward points for eco-friendly vouchers and discount coupons.</p>
+    </div>
+  </div>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success"><%= success %></div>
+  <% } %>
+
+  <!-- Hero Wallet Balance Display -->
+  <div class="wallet-hero">
+    <div>
+      <h2>Available Balance</h2>
+      <div class="balance-amount num">
+        <%= (typeof user !== 'undefined' && user && typeof user.rewardPoints !== 'undefined') ? user.rewardPoints : 0 %>
+        <span style="font-size: 1.25rem; font-weight: 500; opacity: 0.85;">PTS</span>
+      </div>
+      <div style="font-size: 0.875rem; margin-top: 0.5rem; opacity: 0.9;">
+        Earned from recycled electronics &bull; 100 PTS &asymp; ₹50 voucher value
+      </div>
+    </div>
+    <div>
+      <a href="/citizen/book" class="btn-secondary" style="background-color: #ffffff; color: var(--ink); border: none; display: inline-block;">
+        + Recycle More & Earn
+      </a>
+    </div>
+  </div>
+
+  <!-- Simulated Reward Vouchers -->
+  <div class="feature-card" style="margin-bottom: 2rem;">
+    <h2>Available Eco-Vouchers</h2>
+    <p style="color: var(--ink-muted); font-size: 0.875rem; margin-bottom: 1.25rem;">
+      Note: This is a simulated redemption system for demonstration purposes.
+    </p>
+
+    <div class="voucher-grid">
+      <!-- Voucher 1: 100 Pts -->
+      <div class="voucher-card">
+        <div>
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">☕</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">₹50 Green Cafe Coupon</h3>
+          <p style="font-size: 0.825rem; color: var(--ink-muted);">Valid at all partner organic cafes and bakeries.</p>
+        </div>
+        <div style="margin-top: 1rem; border-top: 1px dashed var(--cream-border); padding-top: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+            <span style="font-size: 0.8rem; color: var(--ink-muted);">Cost:</span>
+            <strong class="num" style="color: var(--accent-dark);">100 PTS</strong>
+          </div>
+          <form action="/citizen/wallet/redeem" method="POST" onsubmit="return confirm('Redeem 100 reward points for ₹50 Green Cafe Coupon?');">
+            <input type="hidden" name="points" value="100">
+            <input type="hidden" name="voucherName" value="Redeemed for ₹50 Green Cafe Coupon">
+            <button 
+              type="submit" 
+              class="btn-primary" 
+              style="padding: 0.45rem 0.75rem; font-size: 0.85rem;"
+              <%= (user && user.rewardPoints >= 100) ? '' : 'disabled style="opacity: 0.5; cursor: not-allowed;"' %>
+            >
+              <%= (user && user.rewardPoints >= 100) ? 'Redeem Voucher' : 'Need 100 PTS' %>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Voucher 2: 250 Pts -->
+      <div class="voucher-card">
+        <div>
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🌱</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">₹150 Plant Nursery Voucher</h3>
+          <p style="font-size: 0.825rem; color: var(--ink-muted);">Redeemable for saplings, seeds, and organic compost.</p>
+        </div>
+        <div style="margin-top: 1rem; border-top: 1px dashed var(--cream-border); padding-top: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+            <span style="font-size: 0.8rem; color: var(--ink-muted);">Cost:</span>
+            <strong class="num" style="color: var(--accent-dark);">250 PTS</strong>
+          </div>
+          <form action="/citizen/wallet/redeem" method="POST" onsubmit="return confirm('Redeem 250 reward points for ₹150 Plant Nursery Voucher?');">
+            <input type="hidden" name="points" value="250">
+            <input type="hidden" name="voucherName" value="Redeemed for ₹150 Plant Nursery Voucher">
+            <button 
+              type="submit" 
+              class="btn-primary" 
+              style="padding: 0.45rem 0.75rem; font-size: 0.85rem;"
+              <%= (user && user.rewardPoints >= 250) ? '' : 'disabled style="opacity: 0.5; cursor: not-allowed;"' %>
+            >
+              <%= (user && user.rewardPoints >= 250) ? 'Redeem Voucher' : 'Need 250 PTS' %>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Voucher 3: 500 Pts -->
+      <div class="voucher-card">
+        <div>
+          <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">⚡</div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.25rem;">₹300 Eco Electronics Discount</h3>
+          <p style="font-size: 0.825rem; color: var(--ink-muted);">Discount on certified refurbished and energy-efficient electronics.</p>
+        </div>
+        <div style="margin-top: 1rem; border-top: 1px dashed var(--cream-border); padding-top: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+            <span style="font-size: 0.8rem; color: var(--ink-muted);">Cost:</span>
+            <strong class="num" style="color: var(--accent-dark);">500 PTS</strong>
+          </div>
+          <form action="/citizen/wallet/redeem" method="POST" onsubmit="return confirm('Redeem 500 reward points for ₹300 Eco Electronics Discount?');">
+            <input type="hidden" name="points" value="500">
+            <input type="hidden" name="voucherName" value="Redeemed for ₹300 Eco Electronics Discount">
+            <button 
+              type="submit" 
+              class="btn-primary" 
+              style="padding: 0.45rem 0.75rem; font-size: 0.85rem;"
+              <%= (user && user.rewardPoints >= 500) ? '' : 'disabled style="opacity: 0.5; cursor: not-allowed;"' %>
+            >
+              <%= (user && user.rewardPoints >= 500) ? 'Redeem Voucher' : 'Need 500 PTS' %>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Complete Transaction Ledger History -->
+  <div class="feature-card" style="padding: 1.5rem; overflow-x: auto;">
+    <h2>Transaction Ledger History</h2>
+    <p style="color: var(--ink-muted); font-size: 0.875rem; margin-bottom: 1.25rem;">
+      Audit trail of all points earned from recycled pickups and points debited from redemptions.
+    </p>
+
+    <% if (typeof transactions !== 'undefined' && transactions.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Type</th>
+            <th>Points</th>
+            <th>Description</th>
+            <th>Related Pickup</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% transactions.forEach(tx => { %>
+            <tr>
+              <td class="num" style="color: var(--ink-muted);">
+                <%= new Date(tx.date || tx.createdAt).toLocaleString() %>
+              </td>
+              <td>
+                <% if (tx.type === 'earned') { %>
+                  <span class="status-pill status-Recycled">
+                    + EARNED
+                  </span>
+                <% } else { %>
+                  <span class="status-pill status-Rejected" style="background-color: var(--ink-muted);">
+                    - REDEEMED
+                  </span>
+                <% } %>
+              </td>
+              <td class="num" style="font-weight: 700; font-size: 0.95rem;">
+                <% if (tx.type === 'earned') { %>
+                  <span style="color: var(--status-recycled);">+<%= tx.points %> PTS</span>
+                <% } else { %>
+                  <span style="color: var(--status-rejected);">-<%= tx.points %> PTS</span>
+                <% } %>
+              </td>
+              <td>
+                <%= tx.description || 'Transaction record' %>
+              </td>
+              <td>
+                <% if (tx.relatedRequest) { %>
+                  <a href="/citizen/requests/<%= tx.relatedRequest._id || tx.relatedRequest %>" class="num" style="color: var(--accent-dark); font-weight: 600; text-decoration: none;">
+                    #<%= (tx.relatedRequest._id || tx.relatedRequest).toString().slice(-6).toUpperCase() %>
+                  </a>
+                <% } else { %>
+                  <span style="color: var(--ink-light);">&mdash;</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <div style="text-align: center; padding: 2.5rem 1rem;">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📜</div>
+        <p style="color: var(--ink-muted);">No transaction history yet. Your points will appear here once an agent recycles your pickup.</p>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,165 @@
+<%- include('../partials/adminNav', { pageTitle: 'Recycler Admin Dashboard', activeNav: 'dashboard' }) %>
+
+<main class="main-content">
+  <div class="dashboard-header">
+    <div>
+      <h1>Recycler Operations Dashboard</h1>
+      <p>System-wide recycling analytics, aggregate material weights, category distributions, and regional operational metrics.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="/admin/requests" class="btn-primary" style="width: auto; text-decoration: none;">
+        Pending Queue (<%= (typeof stats !== 'undefined' && stats.pendingCount) ? stats.pendingCount : 0 %>)
+      </a>
+    </div>
+  </div>
+
+  <!-- High Level KPI Metrics -->
+  <div class="card-grid">
+    <div class="stat-card">
+      <div class="stat-title">Total Requests</div>
+      <div class="stat-value"><%= (typeof stats !== 'undefined' && stats.totalRequests) ? stats.totalRequests : 0 %></div>
+      <div class="stat-desc">All historical pickup orders</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">Total Recycled Weight</div>
+      <div class="stat-value num" style="color: var(--status-recycled);">
+        <%= (typeof stats !== 'undefined' && stats.totalWeightCollected) ? stats.totalWeightCollected : 0 %>
+        <span style="font-size: 1rem; font-weight: 500;">KG</span>
+      </div>
+      <div class="stat-desc">Verified recycled e-waste</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">Pending Approvals</div>
+      <div class="stat-value num" style="color: var(--status-requested);">
+        <%= (typeof stats !== 'undefined' && stats.pendingCount) ? stats.pendingCount : 0 %>
+      </div>
+      <div class="stat-desc">Awaiting agent dispatch</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">Active Field Orders</div>
+      <div class="stat-value num" style="color: var(--status-scheduled);">
+        <%= (typeof stats !== 'undefined' && stats.scheduledCount) ? stats.scheduledCount : 0 %>
+      </div>
+      <div class="stat-desc">Scheduled in transit</div>
+    </div>
+  </div>
+
+  <div class="card-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 2rem;">
+    <!-- Category-Wise Breakdown -->
+    <div class="feature-card">
+      <h2>Category-Wise Aggregate Breakdown</h2>
+      <p style="color: var(--ink-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+        Distribution of e-waste types by total collected weight and request volume.
+      </p>
+
+      <% if (typeof categoryBreakdown !== 'undefined' && categoryBreakdown.length > 0) { %>
+        <% 
+          let maxCatWeight = 0;
+          categoryBreakdown.forEach(c => { if (c.totalWeight > maxCatWeight) maxCatWeight = c.totalWeight; });
+          if (maxCatWeight === 0) maxCatWeight = 1;
+        %>
+        <% categoryBreakdown.forEach(cat => { 
+          const percent = Math.min(100, Math.round((cat.totalWeight / maxCatWeight) * 100));
+        %>
+          <div class="progress-container">
+            <div class="progress-header">
+              <span><strong><%= cat.categoryName %></strong> (<%= cat.count %> requests)</span>
+              <span class="num"><strong><%= cat.totalWeight %> kg</strong></span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width: <%= percent %>%; background-color: var(--status-recycled);"></div>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <p style="color: var(--ink-muted); font-size: 0.9rem;">No category aggregate data available.</p>
+      <% } %>
+    </div>
+
+    <!-- Area-Wise Breakdown -->
+    <div class="feature-card">
+      <h2>Area & Zone Breakdown</h2>
+      <p style="color: var(--ink-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+        Geographical locality distribution of e-waste collection orders and volume.
+      </p>
+
+      <% if (typeof areaBreakdown !== 'undefined' && areaBreakdown.length > 0) { %>
+        <% 
+          let maxAreaCount = 0;
+          areaBreakdown.forEach(a => { if (a.count > maxAreaCount) maxAreaCount = a.count; });
+          if (maxAreaCount === 0) maxAreaCount = 1;
+        %>
+        <% areaBreakdown.forEach(area => { 
+          const percent = Math.min(100, Math.round((area.count / maxAreaCount) * 100));
+        %>
+          <div class="progress-container">
+            <div class="progress-header">
+              <span>📍 <strong><%= area.areaName || 'General Zone' %></strong> (<%= area.count %> requests)</span>
+              <span class="num"><strong><%= area.totalWeight %> kg</strong></span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width: <%= percent %>%; background-color: var(--accent);"></div>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <p style="color: var(--ink-muted); font-size: 0.9rem;">No area aggregate data available.</p>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Recent System Requests -->
+  <div class="feature-card" style="padding: 1.5rem; overflow-x: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h2>Recent System Pickup Activity</h2>
+      <a href="/admin/requests" style="color: var(--accent-dark); font-weight: 600; text-decoration: none; font-size: 0.875rem;">
+        Open Request Queue &rarr;
+      </a>
+    </div>
+
+    <% if (typeof recentRequests !== 'undefined' && recentRequests.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Citizen</th>
+            <th>Category</th>
+            <th>Preferred Date</th>
+            <th>Status</th>
+            <th>Assigned Agent</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% recentRequests.forEach(req => { %>
+            <tr>
+              <td>
+                <strong><%= req.citizen ? req.citizen.name : 'Citizen' %></strong>
+                <div style="font-size: 0.75rem; color: var(--ink-muted);"><%= req.citizen ? req.citizen.email : '' %></div>
+              </td>
+              <td>
+                <%= req.itemCategory ? req.itemCategory.name : 'E-Waste' %>
+              </td>
+              <td class="num" style="color: var(--ink-muted);">
+                <%= new Date(req.preferredDate).toLocaleDateString() %>
+              </td>
+              <td>
+                <span class="status-pill status-<%= req.status %>">
+                  <%= req.status %>
+                </span>
+              </td>
+              <td>
+                <%= req.assignedAgent ? req.assignedAgent.name : 'Unassigned' %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p style="color: var(--ink-muted);">No system pickup records found.</p>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

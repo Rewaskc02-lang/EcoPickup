@@ -1,0 +1,100 @@
+<%- include('../partials/adminNav', { pageTitle: isEdit ? 'Edit Centre' : 'Add Centre', activeNav: 'centres' }) %>
+
+<main class="main-content">
+  <div class="dashboard-header">
+    <div>
+      <a href="/admin/centres" style="color: var(--slate-600); text-decoration: none; font-size: 0.9rem; font-weight: 600;">
+        &larr; Back to Collection Centres
+      </a>
+      <h1 style="margin-top: 0.5rem;"><%= isEdit ? 'Edit Collection Centre' : 'Register Collection Centre' %></h1>
+      <p><%= isEdit ? 'Update facility location, capacity, or contact information.' : 'Add a new e-waste reception facility to the regional network.' %></p>
+    </div>
+  </div>
+
+  <div style="max-width: 580px; margin: 0 auto;">
+    <div class="feature-card" style="padding: 2.25rem;">
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+
+      <form action="<%= isEdit ? ('/admin/centres/edit/' + centre._id) : '/admin/centres' %>" method="POST">
+        <div class="form-group">
+          <label class="form-label" for="name">Centre Facility Name *</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="name" 
+            class="form-control" 
+            placeholder="e.g. EcoRecycle Central Hub" 
+            value="<%= (centre && centre.name) ? centre.name : '' %>"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="address">Full Street Address *</label>
+          <input 
+            type="text" 
+            id="address" 
+            name="address" 
+            class="form-control" 
+            placeholder="e.g. Plot 45, Industrial Eco Park, 2nd Avenue" 
+            value="<%= (centre && centre.address) ? centre.address : '' %>"
+            required
+          >
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="area">Locality / Zone *</label>
+            <input 
+              type="text" 
+              id="area" 
+              name="area" 
+              class="form-control" 
+              placeholder="e.g. Downtown / North" 
+              value="<%= (centre && centre.area) ? centre.area : '' %>"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="contactNumber">Contact Phone</label>
+            <input 
+              type="tel" 
+              id="contactNumber" 
+              name="contactNumber" 
+              class="form-control" 
+              placeholder="e.g. +1 555-0188" 
+              value="<%= (centre && centre.contactNumber) ? centre.contactNumber : '' %>"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="capacityKg">Processing Capacity (Kg, Optional)</label>
+          <input 
+            type="number" 
+            id="capacityKg" 
+            name="capacityKg" 
+            class="form-control" 
+            placeholder="e.g. 5000" 
+            value="<%= (centre && centre.capacityKg) ? centre.capacityKg : '' %>"
+            min="0"
+          >
+        </div>
+
+        <div style="margin-top: 1.75rem; display: flex; gap: 1rem;">
+          <button type="submit" class="btn-primary">
+            <%= isEdit ? 'Save Changes' : 'Register Centre' %>
+          </button>
+          <a href="/admin/centres" class="btn-logout" style="background: var(--slate-100); color: var(--slate-700); text-decoration: none; text-align: center; padding: 0.85rem 1.25rem; font-weight: 600;">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

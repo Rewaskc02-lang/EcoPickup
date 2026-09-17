@@ -1,0 +1,83 @@
+<%- include('../partials/citizenNav', { pageTitle: 'My Requests', activeNav: 'requests' }) %>
+
+<main class="main-content">
+  <div class="dashboard-header">
+    <div>
+      <h1>My Pickup Requests</h1>
+      <p>Track the real-time status of your e-waste collections.</p>
+    </div>
+    <div>
+      <a href="/citizen/book" class="btn-primary" style="text-decoration: none; padding: 0.65rem 1.25rem; width: auto;">
+        + Book New Pickup
+      </a>
+    </div>
+  </div>
+
+  <div class="feature-card" style="padding: 1.5rem; overflow-x: auto;">
+    <% if (typeof requests !== 'undefined' && requests.length > 0) { %>
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--slate-200); color: var(--slate-600); font-size: 0.85rem; text-transform: uppercase;">
+            <th style="padding: 0.75rem 1rem;">Date</th>
+            <th style="padding: 0.75rem 1rem;">Category</th>
+            <th style="padding: 0.75rem 1rem;">Items / Approx Wt</th>
+            <th style="padding: 0.75rem 1rem;">Area</th>
+            <th style="padding: 0.75rem 1rem;">Status</th>
+            <th style="padding: 0.75rem 1rem;">Agent Assigned</th>
+            <th style="padding: 0.75rem 1rem; text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% requests.forEach(req => { %>
+            <tr style="border-bottom: 1px solid var(--slate-200); font-size: 0.95rem;">
+              <td style="padding: 1rem;">
+                <strong><%= new Date(req.createdAt).toLocaleDateString() %></strong>
+                <div style="font-size: 0.8rem; color: var(--slate-500);">Preferred: <%= new Date(req.preferredDate).toLocaleDateString() %></div>
+              </td>
+              <td style="padding: 1rem;">
+                <strong><%= req.itemCategory ? req.itemCategory.name : 'Unknown' %></strong>
+              </td>
+              <td style="padding: 1rem;">
+                <%= req.quantity %> items / <%= req.approxWeightKg %> kg
+              </td>
+              <td style="padding: 1rem;">
+                <%= req.area %>
+              </td>
+              <td style="padding: 1rem;">
+                <% 
+                  let statusClass = 'citizen';
+                  if (req.status === 'Requested') statusClass = 'citizen';
+                  else if (req.status === 'Scheduled') statusClass = 'agent';
+                  else if (req.status === 'Collected') statusClass = 'admin';
+                  else if (req.status === 'Recycled') statusClass = 'citizen';
+                %>
+                <span class="role-tag <%= statusClass %>" style="font-size: 0.8rem;">
+                  <%= req.status %>
+                </span>
+              </td>
+              <td style="padding: 1rem;">
+                <%= req.assignedAgent ? req.assignedAgent.name : 'Not yet assigned' %>
+              </td>
+              <td style="padding: 1rem; text-align: right;">
+                <a href="/citizen/requests/<%= req._id %>" style="color: var(--primary-dark); font-weight: 600; text-decoration: none;">
+                  View Details &rarr;
+                </a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <div style="text-align: center; padding: 3rem 1rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+        <h3 style="margin-bottom: 0.5rem; color: var(--slate-800);">No Pickup Requests Found</h3>
+        <p style="color: var(--slate-500); margin-bottom: 1.5rem;">You haven't scheduled any e-waste pickups yet.</p>
+        <a href="/citizen/book" class="btn-primary" style="display: inline-block; text-decoration: none; width: auto; padding: 0.75rem 1.5rem;">
+          Book Your First Pickup
+        </a>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,146 @@
+<%- include('../partials/citizenNav', { pageTitle: 'Citizen Dashboard', activeNav: 'dashboard' }) %>
+
+<main class="main-content">
+  <div class="dashboard-header">
+    <div>
+      <h1>Citizen Dashboard</h1>
+      <p>Welcome back, <strong><%= (typeof user !== 'undefined' && user && user.name) ? user.name : 'Citizen' %></strong>! Track your household e-waste collections and environmental reward points.</p>
+    </div>
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="/citizen/book" class="btn-primary" style="width: auto; text-decoration: none;">
+        + Book a Pickup
+      </a>
+      <a href="/citizen/wallet" class="btn-secondary">
+        💰 View Wallet
+      </a>
+    </div>
+  </div>
+
+  <!-- Key Metrics Cards -->
+  <div class="card-grid">
+    <div class="stat-card">
+      <div class="stat-title">Total Requests</div>
+      <div class="stat-value"><%= (typeof stats !== 'undefined' && typeof stats.totalRequests !== 'undefined') ? stats.totalRequests : 0 %></div>
+      <div class="stat-desc">Lifetime collection bookings</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">Reward Balance</div>
+      <div class="stat-value" style="color: var(--accent-dark);">
+        <%= (typeof stats !== 'undefined' && typeof stats.rewardPoints !== 'undefined') ? stats.rewardPoints : 0 %>
+        <span style="font-size: 0.95rem; font-weight: 500;">PTS</span>
+      </div>
+      <div class="stat-desc"><a href="/citizen/wallet" style="color: var(--accent-dark); font-weight: 600; text-decoration: none;">Redeem in Wallet &rarr;</a></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">Recycled & Verified</div>
+      <div class="stat-value" style="color: var(--status-recycled);">
+        <%= (typeof stats !== 'undefined' && typeof stats.countRecycled !== 'undefined') ? stats.countRecycled : 0 %>
+      </div>
+      <div class="stat-desc">Successfully recycled items</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-title">In Progress</div>
+      <div class="stat-value" style="color: var(--status-scheduled);">
+        <%= (typeof stats !== 'undefined') ? (stats.countRequested + stats.countScheduled + stats.countCollected) : 0 %>
+      </div>
+      <div class="stat-desc">Pending review or collection</div>
+    </div>
+  </div>
+
+  <!-- Status Distribution Breakdown -->
+  <div class="feature-card" style="margin-bottom: 2rem;">
+    <h2>Request Status Breakdown</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-top: 1rem;">
+      <div style="background: var(--cream-panel); border: 1px solid var(--cream-border); padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
+        <span class="status-pill status-Requested" style="margin-bottom: 0.5rem;">Requested</span>
+        <div class="stat-value" style="font-size: 1.5rem;"><%= (typeof stats !== 'undefined') ? stats.countRequested : 0 %></div>
+        <div style="font-size: 0.75rem; color: var(--ink-muted);">Awaiting review</div>
+      </div>
+
+      <div style="background: var(--cream-panel); border: 1px solid var(--cream-border); padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
+        <span class="status-pill status-Scheduled" style="margin-bottom: 0.5rem;">Scheduled</span>
+        <div class="stat-value" style="font-size: 1.5rem;"><%= (typeof stats !== 'undefined') ? stats.countScheduled : 0 %></div>
+        <div style="font-size: 0.75rem; color: var(--ink-muted);">Agent assigned</div>
+      </div>
+
+      <div style="background: var(--cream-panel); border: 1px solid var(--cream-border); padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
+        <span class="status-pill status-Collected" style="margin-bottom: 0.5rem;">Collected</span>
+        <div class="stat-value" style="font-size: 1.5rem;"><%= (typeof stats !== 'undefined') ? stats.countCollected : 0 %></div>
+        <div style="font-size: 0.75rem; color: var(--ink-muted);">At recycling hub</div>
+      </div>
+
+      <div style="background: var(--cream-panel); border: 1px solid var(--cream-border); padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
+        <span class="status-pill status-Recycled" style="margin-bottom: 0.5rem;">Recycled</span>
+        <div class="stat-value" style="font-size: 1.5rem;"><%= (typeof stats !== 'undefined') ? stats.countRecycled : 0 %></div>
+        <div style="font-size: 0.75rem; color: var(--ink-muted);">Points credited</div>
+      </div>
+
+      <div style="background: var(--cream-panel); border: 1px solid var(--cream-border); padding: 1rem; border-radius: var(--radius-sm); text-align: center;">
+        <span class="status-pill status-Rejected" style="margin-bottom: 0.5rem;">Rejected</span>
+        <div class="stat-value" style="font-size: 1.5rem;"><%= (typeof stats !== 'undefined') ? stats.countRejected : 0 %></div>
+        <div style="font-size: 0.75rem; color: var(--ink-muted);">Unserviceable</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="feature-card" style="padding: 1.5rem; overflow-x: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+      <h2>Recent Pickup Requests</h2>
+      <a href="/citizen/requests" style="color: var(--accent-dark); font-weight: 600; text-decoration: none; font-size: 0.875rem;">
+        View All Requests &rarr;
+      </a>
+    </div>
+
+    <% if (typeof recentRequests !== 'undefined' && recentRequests.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Qty / Est. Wt</th>
+            <th>Status</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% recentRequests.forEach(req => { %>
+            <tr>
+              <td class="num" style="color: var(--ink-muted);">
+                <%= new Date(req.createdAt).toLocaleDateString() %>
+              </td>
+              <td>
+                <strong><%= req.itemCategory ? req.itemCategory.name : 'E-Waste' %></strong>
+              </td>
+              <td class="num">
+                <%= req.quantity %> item(s) / <%= req.approxWeightKg %> kg
+              </td>
+              <td>
+                <span class="status-pill status-<%= req.status %>">
+                  <%= req.status %>
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <a href="/citizen/requests/<%= req._id %>" style="color: var(--accent-dark); font-weight: 600; text-decoration: none;">
+                  View &rarr;
+                </a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <div style="text-align: center; padding: 2rem 1rem;">
+        <p style="color: var(--ink-muted); margin-bottom: 1rem;">No pickup requests found.</p>
+        <a href="/citizen/book" class="btn-primary" style="display: inline-block; width: auto; text-decoration: none;">
+          Book Your First Pickup
+        </a>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
